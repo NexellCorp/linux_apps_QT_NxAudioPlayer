@@ -25,9 +25,9 @@ SOURCES += main.cpp \
         playlistwindow.cpp
 
 
-INCLUDEPATH += $$PWD/../id3lib/include
-LIBS        += $$PWD/../id3lib/lib/libid3.a
-LIBS        += $$PWD/../id3lib/lib/libz.a
+INCLUDEPATH += $$PWD/../libid3/include
+LIBS        += $$PWD/../libid3/lib/libid3.a
+LIBS        += $$PWD/../libid3/lib/libz.a
 
 
 HEADERS  += mainwindow.h \

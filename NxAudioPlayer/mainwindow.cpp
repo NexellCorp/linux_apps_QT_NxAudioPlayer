@@ -7,9 +7,9 @@
 #include "ui_mainwindow.h"
 #include "playlistwindow.h"
 
-#include "../id3lib/include/id3/tag.h"
-#include "../id3lib/include/id3/field.h"
-#include "../id3lib/include/id3/misc_support.h"
+#include "../libid3/include/id3/tag.h"
+#include "../libid3/include/id3/field.h"
+#include "../libid3/include/id3/misc_support.h"
 
 static const char *NX_AUDIO_EXTENSION[] = {
 	".mp3", ".ogg", ".flac", ".wma", ".aac", ".wav", ".mp4a"

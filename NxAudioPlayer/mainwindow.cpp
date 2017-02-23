@@ -6,6 +6,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "playlistwindow.h"
+#include "nx_ipc_cmd_receiver.h"
+#include "eventsender.h"
 
 #include "../libid3/include/id3/tag.h"
 #include "../libid3/include/id3/field.h"
@@ -19,7 +21,7 @@ static const char *NX_AUDIO_EXTENSION[] = {
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , m_duration(0)
-    , m_volValue(30)
+	, m_volValue(100)
     , m_fileIndex(0)
     , m_curFileListIdx (0)
 	, m_pPlayer(NULL)
@@ -80,12 +82,19 @@ MainWindow::MainWindow(QWidget *parent)
         m_curFileListIdx = m_fileIndex;
 		m_pPlayer->play();
 		UpdateAlbumInfo();
-
 	}
+
+	//	Connect Update Window Event
+	connect( &m_EventSender, SIGNAL(UpdateWindowEvent(int)), SLOT(UpdateWindowEvent(int)) );
+
+	//	Registration(Initialize) External Command Callback Function
+	StartCommandProc();
+	RegCommandCallback( this, ExtCmdCallback );
 }
 
 MainWindow::~MainWindow()
 {
+	StopCommandProc();
     delete ui;
 }
 ////////////////////////////////////////////////////////////////////
@@ -477,4 +486,138 @@ void MainWindow::UpdateAlbumInfo()
 	}
 #endif
 
+}
+
+
+//
+//	Event Sender's Slot
+//
+
+void MainWindow::UpdateWindowEvent(int32_t id)
+{
+	if( -1 == id )	//	Update All Informations
+	{
+		//	Update Volume
+		ui->volumeProgressBar->setValue(m_volValue);
+		ui->volumelabel->setText(QString("%1").arg(m_volValue));
+		//	Update Album Info
+		UpdateAlbumInfo();
+	}
+}
+
+//
+//	External Command Procedure
+//
+void MainWindow::ExtCmdCallback( void *pArg, char *cmd )
+{
+	MainWindow *pObj = (MainWindow *)pArg;
+	if( pObj )
+	{
+		pObj->ExtCmdProcedure( cmd );
+	}
+}
+
+void MainWindow::ExtCmdProcedure( char *cmd )
+{
+	if( 0 )
+	{
+	}
+	else if( !strncasecmp(cmd, "Music Play", 10) )
+	{
+		qDebug() << "MusicPlayer: Music Play!!!!" << endl;
+		if(m_pPlayer)
+		{
+			m_pPlayer->play();
+		}
+	}
+	else if( !strncasecmp(cmd, "Music Pause", 11) )
+	{
+		qDebug() << "MusicPlayer: Music Pause!!!!" << endl;
+		if(m_pPlayer)
+		{
+			m_pPlayer->pause();
+		}
+	}
+	else if( !strncasecmp(cmd, "Music Resume", 12) )
+	{
+		qDebug() << "MusicPlayer: Music Resume!!!!" << endl;
+		if(m_pPlayer)
+		{
+			m_pPlayer->play();
+		}
+	}
+	else if( !strncasecmp(cmd, "Volume Up", 9) )
+	{
+		int32_t prevVolume = m_volValue;
+		if( m_pPlayer )
+		{
+			m_volValue += 20;
+			if( m_volValue > 100 )
+				m_volValue = 100;
+			m_pPlayer->setVolume(m_volValue);
+		}
+		m_EventSender.UpdateWindow( -1 );
+		qDebug() << "MusicPlayer: Volume Up (" << prevVolume << "-->" << m_volValue << ")" << endl;
+	}
+	else if( !strncasecmp(cmd, "Volume Down", 11) )
+	{
+		int32_t prevVolume = m_volValue;
+		if( m_pPlayer )
+		{
+			m_volValue -= 20;
+			if( m_volValue < 0 )
+				m_volValue = 0;
+			m_pPlayer->setVolume(m_volValue);
+			m_EventSender.UpdateWindow( -1 );
+		}
+		qDebug() << "MusicPlayer: Volume Down (" << prevVolume << "-->" << m_volValue << ")" << endl;
+	}
+//	else if( !strncasecmp(cmd, "Music Next", 10) )
+	else if( !strncasecmp(cmd, "LED On", 6) )
+	{
+		if(m_pPlayer)
+		{
+			if( (m_fileList.GetSize()-1 == m_fileIndex) || ( 1 == m_fileList.GetSize() ) )
+			{
+				m_fileIndex = 0;
+				m_curFileListIdx = m_fileIndex;
+			}
+			else
+			{
+				m_fileIndex++;
+				m_curFileListIdx = m_fileIndex;
+			}
+			m_pPlayer->stop();
+			m_pPlayer->setMedia(QUrl::fromLocalFile(m_fileList.GetList(m_fileIndex)));
+			m_pPlayer->play();
+			m_EventSender.UpdateWindow( -1 );
+		}
+		qDebug() << "MusicPlayer: Music Next!!!!" << endl;
+	}
+//	else if( !strncasecmp(cmd, "Music Previous", 14) )
+	else if( !strncasecmp(cmd, "LED Off", 7) )
+	{
+		if(m_pPlayer)
+		{
+			if( (0 == m_fileIndex) || (1 == m_fileList.GetSize()) )
+			{
+				m_fileIndex = m_fileList.GetSize()-1;
+				m_curFileListIdx = m_fileIndex;
+			}
+			else
+			{
+				m_fileIndex--;
+				m_curFileListIdx = m_fileIndex;
+			}
+			m_pPlayer->stop();
+			m_pPlayer->setMedia(QUrl::fromLocalFile(m_fileList.GetList(m_fileIndex)));
+			m_pPlayer->play();
+			m_EventSender.UpdateWindow( -1 );
+		}
+		qDebug() << "MusicPlayer: Music Previous!!!!" << endl;
+	}
+	else
+	{
+		qDebug() << "Unknwon Command :" << cmd << endl;
+	}
 }

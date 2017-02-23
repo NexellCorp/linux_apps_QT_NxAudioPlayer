@@ -22,7 +22,10 @@ TEMPLATE = app
 SOURCES += main.cpp \
         mainwindow.cpp \
         NX_CFileList.cpp \
-        playlistwindow.cpp
+        playlistwindow.cpp \
+        eventsender.cpp \
+        SockUtils.cpp \
+        nx_ipc_cmd_receiver.cpp
 
 
 INCLUDEPATH += $$PWD/../libid3/include
@@ -32,7 +35,10 @@ LIBS        += $$PWD/../libid3/lib/libz.a
 
 HEADERS  += mainwindow.h \
 			NX_CFileList.h \
-			playlistwindow.h
+			playlistwindow.h \
+            nx_ipc_cmd_receiver.h \
+            eventsender.h \
+            SockUtils.h
 
 FORMS    += mainwindow.ui \
 			playlistwindow.ui

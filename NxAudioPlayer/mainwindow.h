@@ -13,6 +13,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include "NX_CFileList.h"
+#include "eventsender.h"
 
 #define VOLUME_MIN  0
 #define VOLUME_MAX  100
@@ -53,6 +54,13 @@ private:
 	bool	m_bSeekReady;
     bool    m_bVoumeCtrlReady;
 
+	//	Event Sender
+	EventSender m_EventSender;
+
+	//	Static Command Thread
+	static void ExtCmdCallback( void *, char * );
+	void	ExtCmdProcedure( char *cmd );
+
 private:
     void updateDurationInfo(qint64 currentInfo);
     //  Update Progress Bar
@@ -82,6 +90,10 @@ private slots:
 	void on_closeButton_released();
 
 	void on_playListButton_clicked();
+
+	//	Event Sender
+	void UpdateWindowEvent(int id);
+
 
 private:
     Ui::MainWindow *ui;

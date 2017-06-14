@@ -4,10 +4,10 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    MainWindow w;
+	QApplication a(argc, argv);
+	MainWindow w;
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("eucKR"));
 	w.setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
 	w.show();
-    return a.exec();
+	return a.exec();
 }

@@ -10,3 +10,8 @@ void EventSender::UpdateWindow( int32_t id )
 {
 	emit UpdateWindowEvent( id );
 }
+
+void EventSender::RunExtCmd( char *cmd )
+{
+	emit ExtCmdProcedure( cmd );
+}

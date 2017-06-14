@@ -19,19 +19,19 @@ public:
 	~PlayListWindow();
 
 public:
-    void setList(NX_CFileList *pFileList);
-    void setCurrentIndex(int idx);
-    int getCurrentIndex();
+	void setList(NX_CFileList *pFileList);
+	void setCurrentIndex(int idx);
+	int getCurrentIndex();
 
 public:
-    QModelIndex m_selectIdx;
-    int         m_pretIdx;
-    int         m_selectCount;
+	QModelIndex m_selectIdx;
+	int         m_pretIdx;
+	int         m_selectCount;
 
 private slots:
 	void on_btnCancel_released();
 	void on_btnOk_released();
-    void on_listWidget_itemClicked(QListWidgetItem *item);
+	void on_listWidget_itemClicked(QListWidgetItem *item);
 
 private:
 	Ui::PlayListWindow *ui;
